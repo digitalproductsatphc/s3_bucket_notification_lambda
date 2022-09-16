@@ -12,19 +12,19 @@ variable "events" {
 
 variable "prefix" {
   description = "Prefix to filter on"
-  default = ""
+  default     = ""
 }
 
 variable "suffix" {
   description = "Suffix to filter on"
-  default = ""
+  default     = ""
 }
 
 variable "notification_id" {
   description = "The name of the notification"
 }
 
-variable "aws_profile" {
-  description = "The name of the aws profile"
-  default = "default"
-}
+# variable "aws_profile" {
+#   description = "The name of the aws profile"
+#   default     = "default"
+# }
