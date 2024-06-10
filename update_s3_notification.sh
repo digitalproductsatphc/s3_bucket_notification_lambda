@@ -108,23 +108,41 @@ elif [[ -n $1 && $1 == "update" ]]; then
     current=$(echo ${current0} | jq -c "select(.LambdaFunctionConfigurations[] | select(.Id == \"${ID}\"))")
     if [ -z "${current}" ]; then
         # create
+        echo "creating"
         echo "id does not exist, and therefore it will be created"
         if [ -z "${current0}" ]; then
-            # echo new
-            echo "{${json_string}}" | sed 's/.LambdaFunctionConfigurations +=/"LambdaFunctionConfigurations":/' | jq -c |
-                xargs -0I{} aws s3api put-bucket-notification-configuration --bucket "${BUCKET}" --notification-configuration {}
+            echo new
+            # Save config to temp file
+            echo "{${json_string}}" | sed 's/.LambdaFunctionConfigurations +=/"LambdaFunctionConfigurations":/' | jq -c > temp.json
+            # Create bucket notification using config 
+            aws s3api --debug put-bucket-notification-configuration --bucket "${BUCKET}" --notification-configuration file://temp.json
+            # Cleanup temp file
+            rm temp.json
         else
-            # echo existing
-            echo "${current0}" | jq -c "${json_string}" |
-                xargs -0I{} aws s3api put-bucket-notification-configuration --bucket "${BUCKET}" --notification-configuration {}
+            echo "existing"
+            # Save the processed JSON to a temporary file
+            echo "${current0}" | jq -c "${json_string}" > temp.json
+
+            # Read the JSON from the file and pass it to the AWS CLI command
+            aws s3api --debug put-bucket-notification-configuration --bucket "${BUCKET}" --notification-configuration file://temp.json
+
+            # Remove the temporary file
+            rm temp.json
         fi
     else
         # update
-        # echo updating
-        aws s3api get-bucket-notification-configuration --bucket "${BUCKET}" |
-            jq "del(.LambdaFunctionConfigurations[] | select(.Id == \"${ID}\"))" |
-            jq -c "${json_string}" |
-            xargs -0I{} aws s3api put-bucket-notification-configuration --bucket "${BUCKET}" --notification-configuration {}
+        echo "${ID} already exists, updating"
+
+        # Save the processed JSON to a temporary file
+        aws s3api --debug get-bucket-notification-configuration --bucket "${BUCKET}" |
+        jq "del(.LambdaFunctionConfigurations[] | select(.Id == \"${ID}\"))" |
+        jq -c "${json_string}" > temp.json
+
+        # Read the JSON from the file and pass it to the AWS CLI command
+        aws s3api --debug put-bucket-notification-configuration --bucket "${BUCKET}" --notification-configuration file://temp.json
+
+        # Remove the temporary file
+        rm temp.json
     fi
 
 else
