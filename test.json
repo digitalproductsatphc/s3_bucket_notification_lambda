@@ -1,3 +1,0 @@
-{
- "LambdaFunctionConfigurations" : [{"Id": "epoch","LambdaFunctionArn": "arn:aws:lambda:ca-central-1:430461894072:function:ihid-presign-url-generator-function","Events": ["s3:ObjectCreated:*"],"Filter": {"Key": {"FilterRules": [{"Name": "Prefix", "Value": "/epoch/airlock/"}]}}}]
-}

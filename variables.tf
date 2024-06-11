@@ -23,8 +23,3 @@ variable "suffix" {
 variable "notification_id" {
   description = "The name of the notification"
 }
-
-# variable "aws_profile" {
-#   description = "The name of the aws profile"
-#   default     = "default"
-# }
