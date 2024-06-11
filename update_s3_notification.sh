@@ -136,7 +136,7 @@ elif [[ -n $1 && $1 == "update" ]]; then
         # Save the processed JSON to a temporary file
         aws s3api --debug get-bucket-notification-configuration --bucket "${BUCKET}" |
         jq "del(.LambdaFunctionConfigurations[] | select(.Id == \"${ID}\"))" |
-        jq -c "${json_string}" > temp.json
+        jq -c "${json_string}" > temp-${ID}.json
 
         # Read the JSON from the file and pass it to the AWS CLI command
         aws s3api --debug put-bucket-notification-configuration --bucket "${BUCKET}" --notification-configuration file://temp.json
